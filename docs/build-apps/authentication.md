@@ -17,16 +17,16 @@ npm install @stacks/connect
 
 There are two ways to connect to users' wallets:
 
-- [`request_accounts`](#requesting-accounts) is uncomplicated and more general — it returns a single or multiple _unverified_ addresses of the user _(recommended)_
+- [`requestAccounts`](#requesting-accounts) is uncomplicated and more general — it returns a single or multiple _unverified_ addresses of the user _(recommended)_
 - [`authenticate`](#authentication) is more sophisticated — it returns additional data and uses signing to prove that the owner of a given address is providing the data
 
 ### When to use which flow?
 
-For most use-cases [`request_accounts`](#requesting-accounts) will be sufficient. Applications can use the received unverified addresses to filter public data and construct transactions. _[Read more...](#requesting-accounts)_
+For most use-cases [`requestAccounts`](#requesting-accounts) will be sufficient. Applications can use the received unverified addresses to filter public data and construct transactions. _[Read more...](#requesting-accounts)_
 However, [`authenticate`](#authentication) is needed as soon as applications require proof of ownership of an account (e.g. for accessing sensitive data of a user). Browser contexts can be manipulated by users and malicious browser extensions. Therefore, authenticity should be verified on the applications backend. _[Read more...](#authentication)_
 
 :::note Note for Hardware-Wallets
-Currently, applications that want to allow the use of hardware-wallets (e.g. Ledger Nano), can only connect to wallets using [`request_accounts`](#requesting-accounts).
+Currently, applications that want to allow the use of hardware-wallets (e.g. Ledger Nano), can only connect to wallets using [`requestAccounts`](#requesting-accounts).
 :::
 
 <br />
@@ -35,13 +35,13 @@ Currently, applications that want to allow the use of hardware-wallets (e.g. Led
 
 ## Requesting Accounts
 
-Requesting accounts can be used to customize a users' experience and to find a users' publicly available data (e.g. on-chain data). The [`request_accounts`](#requesting-accounts) action simply returns an array of addresses, which were selected by the user using a Stacks wallet.
+Requesting accounts can be used to customize a users' experience and to find a users' publicly available data (e.g. on-chain data). The [`requestAccounts`](#requesting-accounts) action simply returns an array of addresses, which were selected by the user using a Stacks wallet.
 
 This type of connecting to a wallet should not be confused with traditional "authentication". This flow does not prove that the current user is the owner of those addresses. A received address should not be used to grant access to confidential data! Addresses are public data and could be spoofed by any malicious entity.
 
-The most common use-case for [`request_accounts`](#requesting-accounts) is to provide an address for [constructing transactions to be signed](/build-apps/transaction-signing)), (which will only be valid and accepted by the blockchain if the user is the owner of a provided address).
+The most common use-case for [`requestAccounts`](#requesting-accounts) is to provide an address for [constructing transactions to be signed](/build-apps/transaction-signing)), (which will only be valid and accepted by the blockchain if the user is the owner of a provided address).
 
-### Initiate `request_accounts`
+### Initiate `requestAccounts`
 
 ```js
 import { requestAccounts } from '@stacks/connect';
@@ -58,6 +58,9 @@ function showAddressPopup() {
       // logs the first received address to the console
       //> "ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE"
     },
+    onCancel: () => {
+      console.log('the user canceled');
+    },
   });
 }
 ```
@@ -68,6 +71,7 @@ The `requestAccounts` function accepts a single configuration object with the fo
 
 - The `appDetails` object, containing the applications `name` and `icon` as strings.
 - The `onFinish` callback, providing the function to be executed after a successful selection in the wallet's popup window.
+- The `onCancel` callback, providing a counterpart function to `onFinish`, for the case of a user canceling/closing the popup window.
 
 The popup window for selecting accounts looks something like this:
 
